@@ -1,0 +1,19 @@
+.bgGradient {
+  background: linear-gradient(to right, #cdf9cf, #85fbdc);
+}
+
+.stepper {
+  margin: 2rem 0;
+}
+
+.stepLabel {
+  color: #607d8b;
+}
+
+.stepLabel.Mui-active {
+  color: #4caf50;
+}
+
+.stepLabel.Mui-completed {
+  color: #4caf50;
+}
