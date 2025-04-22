@@ -2,8 +2,9 @@ import React, { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Trash2 } from "lucide-react";
+import { AlertCircle, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Medicine {
   images: {
@@ -36,33 +37,6 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
   touched,
 }) => {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    // const imageUrls = files.map((file) => {
-    //     const reader = new FileReader();
-    //     reader.readAsDataURL(file);
-    //     reader.onloadend = () => {
-    //       if (reader.result) {
-    //          return reader.result
-    //       }
-    //     };
-    //   });
-
-    // const imageUrls = await Promise.all(
-    //   files.map((file) => {
-    //     return new Promise<string>((resolve, reject) => {
-    //       const reader = new FileReader();
-    //       reader.readAsDataURL(file);
-    //       reader.onloadend = () => {
-    //         if (reader.result) {
-    //           resolve(reader.result.toString());
-    //         } else {
-    //           reject("Failed to read file");
-    //         }
-    //       };
-    //       reader.onerror = () => reject("File reading error");
-    //     });
-    //   })
-    // );
-
     const files = Array.from(e.target.files || []);
     setFieldValue("images", [...values.images, ...files]);
 
@@ -154,6 +128,13 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
           Medicine Images
         </h2>
+        {errors.images && touched.images && (
+          <Alert className="mb-4 border-red-500 text-red-500 bg-white">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{errors.images}</AlertDescription>
+          </Alert>
+        )}
+
         <div className="space-y-4">
           <div className="flex items-center justify-center w-full">
             <label
@@ -195,14 +176,14 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
                     className="w-full h-32 object-cover"
                   /> */}
                   <div className="relative w-full h-32">
-  <Image
-    src={file.url || URL.createObjectURL(file)}
-    alt={`Medicine ${index + 1}`}
-    fill
-    className="object-cover"
-    sizes="100vw"
-  />
-</div>
+                    <Image
+                      src={file.url || URL.createObjectURL(file)}
+                      alt={`Medicine ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="100vw"
+                    />
+                  </div>
 
                   <div
                     className="absolute inset-0 bg-black bg-opacity-50 opacity-0 
@@ -214,7 +195,9 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
                       size="sm"
                       onClick={() => setMainImage(file)}
                       className={
-                        isMainImage(file) ? "bg-blue-500 text-white" : "text-white"
+                        isMainImage(file)
+                          ? "bg-blue-500 text-white"
+                          : "text-white"
                       }
                     >
                       {isMainImage(file) ? "Main" : "Set as Main"}

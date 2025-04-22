@@ -203,7 +203,7 @@ const MainDetailsTab: React.FC<DetailsTabProps> = ({ medicine, setMedicine,setFi
                 htmlFor="haveVariant"
                 className="text-base font-medium text-gray-900"
               >
-                This medicine has pack sizes
+                Have Pack Size Variants
               </Label>
             </div>
             <Input

@@ -1,161 +1,202 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import { Card } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Label } from '@/components/ui/label'
-import { Edit, ImageIcon, Plus, Trash2, X } from 'lucide-react'
-import { Input } from '@/components/ui/input'
+import React, { useState } from "react";
+import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Label } from "@/components/ui/label";
+import { AlertCircle, Edit, ImageIcon, Plus, Trash2, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import * as Yup from "yup";
-import { useFormik } from 'formik'
-import VariantDialog from './VariantDialog'
+import { useFormik } from "formik";
+import VariantDialog from "./VariantDialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Variant {
-  quantity: string
+  quantity: string;
   listPrice: string;
-  sellingPrice:string;
-  images: string[]
+  sellingPrice: string;
+  images: string[];
 }
 
 type Props = {
-  medicine: any
-  setMedicine: any
-  setFieldValue: any
-  values: any
-}
-
+  medicine: any;
+  setMedicine: any;
+  setFieldValue: any;
+  values: any;
+  errors: any;
+};
 
 export default function PackSizeTab({
   medicine,
   setMedicine,
   values,
   setFieldValue,
+  errors,
 }: Props) {
-  const [newVariant, setNewVariant] = useState<Variant>({ quantity: '', listPrice: '', sellingPrice:'', images: [] })
-  const [isVariantDialogOpen, setIsVariantDialogOpen] = useState(false)
-  const [editingVariant, setEditingVariant] = useState<string | null>(null)
-  const [quantityError, setQuantityError] = useState<string | null>(null)
+  const [newVariant, setNewVariant] = useState<Variant>({
+    quantity: "",
+    listPrice: "",
+    sellingPrice: "",
+    images: [],
+  });
+  const [isVariantDialogOpen, setIsVariantDialogOpen] = useState(false);
+  const [editingVariant, setEditingVariant] = useState<string | null>(null);
+  const [quantityError, setQuantityError] = useState<string | null>(null);
 
   // const isQuantityUnique = (quantity: string) => {
-  //   return !values.packSize.some((pack: Variant) => 
+  //   return !values.packSize.some((pack: Variant) =>
   //     pack.quantity === quantity && pack.quantity !== editingVariant
   //   )
   // }
 
   const isQuantityUnique = (quantity: string) => {
     const normalizedQuantity = quantity.trim().toLowerCase();
-    return !values.packSize.some((pack: Variant) => 
-      pack.quantity.trim().toLowerCase() === normalizedQuantity &&
-      pack.quantity.trim().toLowerCase() !== editingVariant?.trim().toLowerCase()
+    return !values.packSize.some(
+      (pack: Variant) =>
+        pack.quantity.trim().toLowerCase() === normalizedQuantity &&
+        pack.quantity.trim().toLowerCase() !==
+          editingVariant?.trim().toLowerCase()
     );
   };
-  
 
   const handleAddVariant = () => {
-  
-    if (newVariant.quantity && newVariant.listPrice && newVariant.sellingPrice) {
+    if (
+      newVariant.quantity &&
+      newVariant.listPrice &&
+      newVariant.sellingPrice
+    ) {
       if (isQuantityUnique(newVariant.quantity)) {
         if (editingVariant) {
-          setFieldValue('packSize',
+          setFieldValue(
+            "packSize",
             values.packSize.map((p: Variant) =>
               p.quantity === editingVariant ? { ...newVariant } : p
             )
-          )
+          );
           setMedicine((prev: any) => ({
             ...prev,
             packSize: prev.packSize.map((p: Variant) =>
               p.quantity == editingVariant ? { ...newVariant } : p
             ),
-          }))
-          setEditingVariant(null)
+          }));
+          setEditingVariant(null);
         } else {
-          setFieldValue('packSize', [...values.packSize, newVariant])
+          setFieldValue("packSize", [...values.packSize, newVariant]);
           setMedicine((prev: any) => ({
             ...prev,
             packSize: [...prev.packSize, newVariant],
-          }))
+          }));
         }
-        setNewVariant({ quantity: "", listPrice: "",sellingPrice:"", images: [] })
-        setIsVariantDialogOpen(false)
-        setQuantityError(null)
+        setNewVariant({
+          quantity: "",
+          listPrice: "",
+          sellingPrice: "",
+          images: [],
+        });
+        setIsVariantDialogOpen(false);
+        setQuantityError(null);
       } else {
-        setQuantityError("This pack quantity already exists. Please enter a unique value.")
+        setQuantityError(
+          "This pack quantity already exists. Please enter a unique value."
+        );
       }
-
- }
-
-  }
+    }
+  };
 
   const handleEditVariant = (variant: Variant) => {
-    setNewVariant(variant)
-    setEditingVariant(variant.quantity)
-    setIsVariantDialogOpen(true)
-    setQuantityError(null)
-  }
+    setNewVariant(variant);
+    setEditingVariant(variant.quantity);
+    setIsVariantDialogOpen(true);
+    setQuantityError(null);
+  };
 
   const handleRemoveVariant = (quantity: string) => {
-    setFieldValue('packSize',
+    setFieldValue(
+      "packSize",
       values.packSize.filter((pack: Variant) => pack.quantity !== quantity)
-    )
+    );
     setMedicine((prev: any) => ({
       ...prev,
-      packSize: prev.packSize.filter((pack: Variant) => pack.quantity !== quantity)
-    }))
-  }
+      packSize: prev.packSize.filter(
+        (pack: Variant) => pack.quantity !== quantity
+      ),
+    }));
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || [])
-    setNewVariant({ ...newVariant, images: [...newVariant.images, ...files] })
-  }
+    const files = Array.from(e.target.files || []);
+    setNewVariant({ ...newVariant, images: [...newVariant.images, ...files] });
+  };
 
   const removeImage = (index: number) => {
     setNewVariant({
       ...newVariant,
-      images: newVariant.images.filter((_, i) => i !== index)
-    })
-  }
+      images: newVariant.images.filter((_, i) => i !== index),
+    });
+  };
 
-
-  const getImagePreview =(image: File | { url: string; public_id: string })=> {
+  const getImagePreview = (
+    image: File | { url: string; public_id: string }
+  ) => {
     if (image instanceof File) {
       return URL.createObjectURL(image);
     }
     return image.url;
-  }
-
+  };
 
   return (
     <Card className="p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-gray-800">Medicine Variants</h2>
-          <Button 
-          onClick={()=> setIsVariantDialogOpen(true)}
-          className="bg-gray-700 text-white hover:bg-gray-600">
-                  <Plus size={16} className="mr-2" />
-                  Add Variant
-          </Button>
-        {isVariantDialogOpen && (
-             <VariantDialog
-         isVariantDialogOpen={isVariantDialogOpen}
-         setIsVariantDialogOpen={setIsVariantDialogOpen}
-         setEditingVariant={setEditingVariant}
-         setNewVariant={setNewVariant}
-         setQuantityError={setQuantityError}
-         editingVariant={editingVariant}
-         newVariant={newVariant}
-         quantityError={quantityError}
-         getImagePreview={getImagePreview}
-         handleAddVariant={handleAddVariant}
-         handleImageUpload={handleImageUpload}
-         removeImage={removeImage}
-         isQuantityUnique={isQuantityUnique}
-        />
-        )}
-     
-      </div>
+        <h2 className="text-xl font-semibold text-gray-800">
+          Medicine Variants
+        </h2>
+        <Button
+          onClick={() => setIsVariantDialogOpen(true)}
+          className="bg-gray-700 text-white hover:bg-gray-600"
+        >
+          <Plus size={16} className="mr-2" />
+          Add Variant
+        </Button>
 
+        {isVariantDialogOpen && (
+          <VariantDialog
+            isVariantDialogOpen={isVariantDialogOpen}
+            setIsVariantDialogOpen={setIsVariantDialogOpen}
+            setEditingVariant={setEditingVariant}
+            setNewVariant={setNewVariant}
+            setQuantityError={setQuantityError}
+            editingVariant={editingVariant}
+            newVariant={newVariant}
+            quantityError={quantityError}
+            getImagePreview={getImagePreview}
+            handleAddVariant={handleAddVariant}
+            handleImageUpload={handleImageUpload}
+            removeImage={removeImage}
+            isQuantityUnique={isQuantityUnique}
+          />
+        )}
+      </div>
+      {errors.packSize && (
+        <Alert className="mb-4 border-red-500 text-red-500 bg-white">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{errors.packSize}</AlertDescription>
+        </Alert>
+      )}
       <Table>
         <TableHeader>
           <TableRow>
@@ -178,10 +219,18 @@ export default function PackSizeTab({
               <TableCell>{pack.sellingPrice}</TableCell>
               <TableCell>
                 <div className="flex space-x-2">
-                  <Button variant="outline" size="sm" onClick={() => handleEditVariant(pack)}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEditVariant(pack)}
+                  >
                     <Edit size={16} />
                   </Button>
-                  <Button variant="destructive" size="sm" onClick={() => handleRemoveVariant(pack.quantity)}>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleRemoveVariant(pack.quantity)}
+                  >
                     <Trash2 size={16} />
                   </Button>
                 </div>
@@ -191,5 +240,5 @@ export default function PackSizeTab({
         </TableBody>
       </Table>
     </Card>
-  )
+  );
 }

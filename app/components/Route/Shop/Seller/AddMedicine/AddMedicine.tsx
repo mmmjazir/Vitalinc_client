@@ -15,6 +15,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useCreateMedicineMutation } from "@/redux/features/medicine/medicineApi";
 import toast from "react-hot-toast";
 import MedicineSideEffectsForm from "./AdditionalDetailsTab/MedicineSideEffectsForm";
+import { motion, AnimatePresence } from "framer-motion"
+import { Badge } from "@/components/ui/badge";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("pharmaceutical name is a required field"),
@@ -260,6 +262,13 @@ const AddMedicine = () => {
     detailsFields.some((field) => touched[field]);
 
 
+    const hasPackSizeErrors = errors.packSize && touched.packSize
+    const hasImagesErrors = errors.images && touched.images
+  
+    const detailsErrorCount = detailsFields.filter((field) => errors[field] && touched[field]).length
+  
+  
+
   return (
     <div className="w-full max-w-4xl mx-auto py-4 px-4 max-md:px-1 lg:px-8">
       <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 sm:mb-6">
@@ -285,10 +294,16 @@ const AddMedicine = () => {
                 <span className="max-md:group-hover:block max-md:group-data-[state=active]:block hidden ml-2 transition-all duration-100 origin-left">
                   Details
                 </span>
-             
-                {hasDetailsErrors && (
-              <CircleAlert size={12} className="ml-1 text-red-600" />
-            )}
+
+
+          {hasDetailsErrors && (
+                  <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="ml-1.5 flex items-center">
+                    <Badge className="h-5 bg-red-500 hover:bg-red-500 text-white px-1.5 text-xs font-medium">
+                      {detailsErrorCount}
+                    </Badge>
+                  </motion.div>
+                )}
+
               </TabsTrigger>
 
               {medicine.haveVariant && (
@@ -301,9 +316,17 @@ const AddMedicine = () => {
                   <span className="max-md:group-hover:block max-md:group-data-[state=active]:block hidden ml-2 transition-all duration-100 origin-left">
                     Pack Sizes
                   </span>
-                  {errors.packSize && touched.packSize && (
-                    <CircleAlert size={12} className="ml-1 text-red-600" />
+            
+
+            {hasPackSizeErrors && (
+                    <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="ml-1.5 flex items-center">
+                      <Badge  className="h-5 bg-red-500 hover:bg-red-500 text-white px-1.5 text-xs font-medium">
+                        1
+                      </Badge>
+                    </motion.div>
                   )}
+
+
                 </TabsTrigger>
               )}
 
@@ -327,9 +350,15 @@ const AddMedicine = () => {
                 <span className="max-md:group-hover:block max-md:group-data-[state=active]:block hidden ml-2 transition-all duration-100 origin-left">
                   Images
                 </span>
-                {errors.images && touched.images && (
-                  <CircleAlert size={12} className="ml-1 text-red-600" />
+
+              {hasImagesErrors && (
+                  <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="ml-1.5 flex items-center">
+                    <Badge className="h-5 bg-red-500 hover:bg-red-500 text-white px-1.5 text-xs font-medium">
+                      1
+                    </Badge>
+                  </motion.div>
                 )}
+
               </TabsTrigger>
             </TabsList>
           </div>
@@ -369,6 +398,7 @@ const AddMedicine = () => {
         <TabsContent className="mt-4" value="variants">
           <PackSizeTab
             setFieldValue={setFieldValue}
+            errors={errors}
             values={values}
             medicine={medicine}
             setMedicine={setMedicine}

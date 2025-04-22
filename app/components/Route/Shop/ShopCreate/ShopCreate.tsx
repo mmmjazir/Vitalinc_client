@@ -9,16 +9,18 @@ import StepOne from "./Steps/StepOne";
 import StepTwo from "./Steps/StepTwo/StepTwo";
 import { useCreatePharmacyMutation } from "@/redux/features/pharmacy/pharmacyApi";
 import toast from "react-hot-toast";
-import { redirect } from "next/navigation";
-import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
-import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+
 import { Building2, MapPin, Phone } from "lucide-react";
 import StepThree from "./Steps/StepThree";
 import Image from "next/image";
+import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 
 const ShopCreate = () => {
   const [createPharmacy, { isLoading, error, isSuccess }] =
     useCreatePharmacyMutation();
+  const { refetch } = useLoadUserQuery(undefined, {});
+    
 
   const [shopDetails, setShopDetails] = useState({
     email: "",
@@ -60,11 +62,12 @@ const ShopCreate = () => {
       Sunday: { isOpen: false },
     },
   });
+  const [placeName, setPlaceName] = useState({locality: "",city:""});
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccess) {   
       toast.success("Pharmacy account created successfully");
-      redirect("seller/shop");
+      refetch();
     }
     if (error) {
       if ("data" in error) {
@@ -226,6 +229,8 @@ const ShopCreate = () => {
                 handleBack={handleBack}
                 handleCreateAndSubmit={handleCreateAndSubmit}
                 isLoading={isLoading}
+                setPlaceName={setPlaceName}
+                placeName={placeName}
               />
             )}
           </motion.div>

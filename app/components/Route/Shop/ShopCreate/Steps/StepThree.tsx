@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { Dispatch, FC, SetStateAction } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,8 @@ interface StepThreeProps {
   handleBack: any;
   handleCreateAndSubmit: () => void;
   isLoading: boolean;
+  setPlaceName: Dispatch<SetStateAction<{ locality: string; city: string }>>
+  placeName: any;
 }
 
 const validationSchema = Yup.object().shape({
@@ -61,6 +63,8 @@ const StepThree: FC<StepThreeProps> = ({
   handleBack,
   handleCreateAndSubmit,
   isLoading,
+  setPlaceName,
+  placeName,
 }) => {
   const formik = useFormik({
     initialValues: {
@@ -78,7 +82,7 @@ const StepThree: FC<StepThreeProps> = ({
   return (
     <Card>
       <CardContent className="p-6">
-        <div onSubmit={handleCreateAndSubmit}>
+        <div>
           <div className="space-y-8">
             {/* Location Section */}
             <div className="space-y-4 mb-6">
@@ -98,6 +102,8 @@ const StepThree: FC<StepThreeProps> = ({
                 touched={touched}
                 setFieldTouched={setFieldTouched}
                 onBlur={handleBlur}
+                setPlaceName={setPlaceName}
+                placeName={placeName}
               />
 
               <div>
@@ -167,6 +173,7 @@ const StepThree: FC<StepThreeProps> = ({
             <Button
               type="submit"
               disabled={!isValid || isLoading}
+              onClick={handleCreateAndSubmit}
               className="bg-teal-600 hover:bg-teal-700 text-white flex items-center gap-2"
             >
               {isLoading ? "Creating..." : "Create & Submit"}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, FC } from "react";
+import React, { useState, useEffect, useCallback, FC, useRef, SetStateAction, Dispatch } from "react";
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
 import { Icon, LatLng } from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -18,11 +18,11 @@ const markerIcon = new Icon({
 
 const isLocationInIndia = async (lat: number, lng: number,getReverseGeoCoding:any,setFieldValue:any,setFieldTouched:any): Promise<any> => {
   try {
-    const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+    const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}addressdetails=1`);
     if(response.data.address.country === "India"){
       setFieldValue('coordinates.error', undefined);
       setFieldTouched('coordinates.error', true, false);
-      return { isInIndia: true, error: null };
+      return { res:response, isInIndia: true, error: null };
     }else{
       setFieldValue('coordinates.error', "Location is outside India. Please select a valid location.");
       setFieldTouched('coordinates.error', true, false);
@@ -90,10 +90,14 @@ type Props={
   touched: any;
   setFieldTouched:any;
   setFieldValue:any;
+  placeName: any;
+  setPlaceName: Dispatch<SetStateAction<{ locality: string; city: string }>>
 }
 
-const LocationSelector:FC<Props> = ({state,setState,handleChange,onBlur,setFieldError,setFieldValue,errors,touched,setFieldTouched}) => {
-  const [placeName, setPlaceName] = useState({locality: "",city:""});
+const LocationSelector:FC<Props> = ({state,setState,handleChange,onBlur,
+                               setFieldError,setFieldValue,errors,
+                               touched,setFieldTouched,placeName,setPlaceName}) => {
+  // const [placeName, setPlaceName] = useState({locality: "",city:""});
   const [searchQuery, setSearchQuery] = useState("");
   const [autocompleteResults, setAutocompleteResults] = useState([]);
   
@@ -104,12 +108,12 @@ const LocationSelector:FC<Props> = ({state,setState,handleChange,onBlur,setField
 
 
 
-  const fetchPlaceName = async (lat: number, lng: number) => {
+  const fetchPlaceName = async (lat: number, lng: number): Promise<void> => {
     try {
       const isInIndia = await isLocationInIndia(lat, lng,getReverseGeoCoding,setFieldValue,setFieldTouched);
     if(isInIndia?.isInIndia){
-      const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1`);
-     
+      // const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1`);
+     const res = isInIndia?.res;
       const city = res.data.address.city || res.data.address.town || res.data.address.village ||  res.data.address.municipality || res.data.address.county;
      const state = res.data.address.state || res.data.address.territory || res.data.address.state_district
       // const locality = res.data.address.suburb || res.data.address.neighbourhood || res.data.address.locality || res.data.address.village || res.data.address.amenity;
@@ -136,10 +140,12 @@ const LocationSelector:FC<Props> = ({state,setState,handleChange,onBlur,setField
       setPlaceName({locality: "",city:""});
     }
   };
+ 
 
   useEffect(() => {
     if (state.coordinates.lat && state.coordinates.lng) {
       fetchPlaceName(state.coordinates.lat, state.coordinates.lng);
+
     }else{
       setPlaceName({locality: "",city:""});
       setState((prev:any)=> ({...prev,address:{...prev.address,city:"",state:""}}))
