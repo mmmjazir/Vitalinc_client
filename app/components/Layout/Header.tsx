@@ -117,13 +117,12 @@ const Header: FC<Props> = ({ activeHeading, navbarOnly }) => {
   useEffect(() => {
     if (isSuccess) {
       toast.success("Login Successfully");      
-
       setOpen(false)
       refetch();
+      signOut({ redirect: false });
       if(redirectRoute !== null || undefined){
           router.push(`${redirectRoute}`)  
       }
-
     }
 
     if (error) {

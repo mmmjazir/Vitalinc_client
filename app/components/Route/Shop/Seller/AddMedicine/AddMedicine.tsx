@@ -257,10 +257,8 @@ const AddMedicine = () => {
     "marketer",
   ];
 
-  const hasDetailsErrors =
-    detailsFields.some((field) => errors[field]) &&
-    detailsFields.some((field) => touched[field]);
 
+  const hasDetailsErrors = detailsFields.some((field) => errors[field] && touched[field]);
 
     const hasPackSizeErrors = errors.packSize && touched.packSize
     const hasImagesErrors = errors.images && touched.images

@@ -31,7 +31,7 @@ export function LogoutDialog({ open, onOpenChange, componentUsed }: LogoutDialog
   const handleLogout = async() => {
     try {
       onOpenChange(false);
-      await signOut({ redirect: false });
+      // await signOut({ redirect: false });
       await logOut({});
       toast.success("You have been logged out.");
     } catch (err) {
