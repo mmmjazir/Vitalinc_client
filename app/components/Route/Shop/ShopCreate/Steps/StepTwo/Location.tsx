@@ -106,7 +106,21 @@ const LocationSelector:FC<Props> = ({state,setState,handleChange,onBlur,
   const [triggerPlaceAutocomplete, { isLoading: isPlaceLoading }] =
     useLazyGetPlaceNameAutocompleteQuery();
 
+const autocompleteRef = useRef<HTMLDivElement>(null);
 
+useEffect(() => {
+  function handleClickOutside(event: MouseEvent) {
+    if (autocompleteRef.current && !autocompleteRef.current.contains(event.target as Node)) {
+      setAutocompleteResults([]);
+    }
+  }
+  
+  document.addEventListener("mousedown", handleClickOutside);
+  
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
 
   const fetchPlaceName = async (lat: number, lng: number): Promise<void> => {
     try {
@@ -210,11 +224,10 @@ const LocationSelector:FC<Props> = ({state,setState,handleChange,onBlur,
     debounce(async (query: string) => {
    
       if (query.length < 3) {
-        // setAutocompleteResults([]);
+        setAutocompleteResults([]);
         return;
       };
       try {  
-        // const res = await axios.get(`https://api.locationiq.com/v1/autocomplete.php?key=${apiKey}&q=${query}&countrycodes=in&limit=5`);
         const results = await triggerPlaceAutocomplete({ query }).unwrap();
         setAutocompleteResults(results.data);        
       } catch (error) {
@@ -252,7 +265,7 @@ const LocationSelector:FC<Props> = ({state,setState,handleChange,onBlur,
     <div className="space-y-4">
       
       <h1 className="font-medium text-md">Add your Pharmacy location</h1>
-      <div className="relative">
+      <div className="relative" ref={autocompleteRef}>
         <input
           type="text"
           className="w-full px-3 py-2 border border-gray-300 rounded-md"

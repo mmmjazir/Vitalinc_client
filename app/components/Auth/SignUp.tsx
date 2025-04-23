@@ -208,11 +208,10 @@ interface Props {
 const schema = Yup.object().shape({
   name: Yup.string().required("Please enter your name!").min(4),
   email: Yup.string().email("Invalid email!").required("Please enter your email!"),
-  password: Yup.string().required("Please enter your password!").min(6)
+  password: Yup.string().required("Please enter your password!").min(8)
     .matches(/^(?=.*[a-z])/, "Must contain one lowercase character")
     .matches(/^(?=.*[A-Z])/, "Must contain one uppercase character")
     .matches(/^(?=.*[0-9])/, "Must contain one number")
-    .matches(/^(?=.*[!@#\$%\^&\*])/, "Must contain one special character"),
 })
 
 const SignUp: FC<Props> = ({ setRoute }) => {

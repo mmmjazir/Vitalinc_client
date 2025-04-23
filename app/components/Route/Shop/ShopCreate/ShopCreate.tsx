@@ -20,7 +20,7 @@ const ShopCreate = () => {
   const [createPharmacy, { isLoading, error, isSuccess }] =
     useCreatePharmacyMutation();
   const { refetch } = useLoadUserQuery(undefined, {});
-    
+
 
   const [shopDetails, setShopDetails] = useState({
     email: "",
